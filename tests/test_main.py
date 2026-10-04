@@ -18,6 +18,7 @@ def test_calculate_cli() -> None:
 
     assert result.stdout.strip() == "14"
 
+
 def test_convert_cli() -> None:
     """Проверяет конвертацию через командную строку."""
     result = subprocess.run(

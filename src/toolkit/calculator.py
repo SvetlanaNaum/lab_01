@@ -4,7 +4,7 @@ from toolkit.errors import CalculationError
 def tokenize(expression: str) -> list[str]:
     """Разбивает арифмитическое выражение на токены."""
     tokens: list[str] = []
-    current = ''
+    current = ""
 
     index = 0
 
@@ -25,10 +25,18 @@ def tokenize(expression: str) -> list[str]:
                 tokens.append(current)
                 current = ""
 
-            if char == "*" and index + 1 < len(expression) and expression[index + 1] == "*":
+            if (
+                char == "*"
+                and index + 1 < len(expression)
+                and expression[index + 1] == "*"
+            ):
                 tokens.append("**")
                 index += 2
-            elif char == "/" and index + 1 < len(expression) and expression[index + 1] == "/":
+            elif (
+                char == "/"
+                and index + 1 < len(expression)
+                and expression[index + 1] == "/"
+            ):
                 tokens.append("//")
                 index += 2
             else:
@@ -44,14 +52,16 @@ def tokenize(expression: str) -> list[str]:
 
     return tokens
 
+
 def parse_number(token: str) -> int | float:
     """Преобразуй строковый токен в целое или дробное число."""
     try:
-        if '.' in token:
+        if "." in token:
             return float(token)
         return int(token)
     except ValueError as error:
-        raise CalculationError(f'Некоректное число: {token}') from error
+        raise CalculationError(f"Некоректное число: {token}") from error
+
 
 def validate_tokens(tokens: list[str]) -> None:
     """Проверяет правильность последовательности токенов."""
@@ -82,9 +92,7 @@ def validate_tokens(tokens: list[str]) -> None:
                 continue
 
             if token == "(":
-                raise CalculationError(
-                    "Ожидался оператор перед открывающей скобкой"
-                )
+                raise CalculationError("Ожидался оператор перед открывающей скобкой")
 
             if token == ")":
                 if open_parentheses == 0:
@@ -103,13 +111,14 @@ def validate_tokens(tokens: list[str]) -> None:
     if open_parentheses != 0:
         raise CalculationError("Не хватает закрывающей скобки")
 
+
 def calculate(tokens: list[str]) -> int | float:
     """Вычисляет арифметическое выражение по списку токенов."""
     values: list[int | float] = []
     operators: list[str] = []
 
     for index, token in enumerate(tokens):
-        if token not in ("+", "-", "*", "/", "%", '//', "**", "(", ")"):
+        if token not in ("+", "-", "*", "/", "%", "//", "**", "(", ")"):
             number = parse_number(token)
             values.append(number)
 
@@ -117,7 +126,8 @@ def calculate(tokens: list[str]) -> int | float:
                 apply_operator(values, operators.pop())
 
         elif token in "+-" and (
-            index == 0 or tokens[index - 1] in ("+", "-", "*", "/", "%", '//', "**", "(")
+            index == 0
+            or tokens[index - 1] in ("+", "-", "*", "/", "%", "//", "**", "(")
         ):
             operators.append("u" + token)
 
@@ -138,16 +148,15 @@ def calculate(tokens: list[str]) -> int | float:
 
         else:
             while (
-                    operators
-                    and operators[-1] != "("
-                    and operators[-1] not in ("u+", "u-")
-                    and (
-                            precedence(operators[-1]) > precedence(token)
-                            or (
-                                    precedence(operators[-1]) == precedence(token)
-                                    and token != "**"
-                            )
+                operators
+                and operators[-1] != "("
+                and operators[-1] not in ("u+", "u-")
+                and (
+                    precedence(operators[-1]) > precedence(token)
+                    or (
+                        precedence(operators[-1]) == precedence(token) and token != "**"
                     )
+                )
             ):
                 apply_operator(values, operators.pop())
 
@@ -163,18 +172,20 @@ def calculate(tokens: list[str]) -> int | float:
 
     return values[0]
 
+
 def evaluate(expression: str) -> int | float:
     """Проверяет и вычисляет арифметическое выражение."""
     tokens = tokenize(expression)
     validate_tokens(tokens)
     return calculate(tokens)
 
+
 def apply_operator(values: list[int | float], operator: str) -> None:
     """выполняет оператор над последними двумя значениями."""
-    if operator in ('u+', 'u-'):
+    if operator in ("u+", "u-"):
         value = values.pop()
 
-        if operator == 'u-':
+        if operator == "u-":
             value = -value
 
         values.append(value)
@@ -182,40 +193,41 @@ def apply_operator(values: list[int | float], operator: str) -> None:
 
     right = values.pop()
     left = values.pop()
-    if operator == '+':
+    if operator == "+":
         result = left + right
-    elif operator == '-':
+    elif operator == "-":
         result = left - right
-    elif operator == '*':
+    elif operator == "*":
         result = left * right
-    elif operator == '/':
+    elif operator == "/":
         if right == 0:
-            raise CalculationError('Деление на ноль')
+            raise CalculationError("Деление на ноль")
         result = left / right
     elif operator == "//":
         if right == 0:
             raise CalculationError("Деление на ноль")
         result = left // right
-    elif operator == '%':
+    elif operator == "%":
         if right == 0:
-            raise CalculationError('Деление на ноль')
+            raise CalculationError("Деление на ноль")
         result = left % right
     elif operator == "**":
-        result = left ** right
+        result = left**right
     else:
-        raise CalculationError(f'Неизвестный оператор: {operator}')
+        raise CalculationError(f"Неизвестный оператор: {operator}")
 
     values.append(result)
+
 
 def precedence(operator: str) -> int:
     """Возвращает приоритет арифметического оператора"""
     if operator == "**":
         return 4
-    if operator in ('u+', 'u-'):
+    if operator in ("u+", "u-"):
         return 3
     if operator in ("*", "/", "//", "%"):
         return 2
-    if operator in '+-':
+    if operator in "+-":
         return 1
 
-    raise CalculationError(f'Неизвестный оператор: {operator}')
+    raise CalculationError(f"Неизвестный оператор: {operator}")
