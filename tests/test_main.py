@@ -36,3 +36,46 @@ def test_convert_cli() -> None:
     )
 
     assert result.stdout.strip() == "0.1"
+
+def test_calculate_error_returns_code_2() -> None:
+    """Проверяет код ошибки калькулятора."""
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "toolkit",
+            "calc",
+            "10 / 0",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 2
+    assert "Деление на ноль" in result.stderr
+    assert result.stdout == ""
+
+
+def test_convert_error_returns_code_2() -> None:
+    """Проверяет код ошибки конвертера."""
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "toolkit",
+            "convert",
+            "100",
+            "--from",
+            "cm",
+            "--to",
+            "kg",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 2
+    assert "Несовместимые единицы" in result.stderr
+    assert result.stdout == ""

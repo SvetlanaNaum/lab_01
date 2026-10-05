@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 from toolkit.calculator import evaluate
 from toolkit.converter import convert
@@ -51,7 +52,8 @@ def main() -> None:
             result = evaluate(args.expression)
             print(result)
         except CalculationError as error:
-            print(f"Ошибка: {error}")
+            print(f"Ошибка: {error}", file=sys.stderr)
+            raise SystemExit(2)
 
     elif args.command == "convert":
         try:
@@ -62,7 +64,8 @@ def main() -> None:
             )
             print(result)
         except ConversionError as error:
-            print(f"Ошибка: {error}")
+            print(f"Ошибка: {error}", file=sys.stderr)
+            raise SystemExit(2)
 
 
 if __name__ == "__main__":
