@@ -7,8 +7,9 @@ def test_calculate_cli() -> None:
     result = subprocess.run(
         [
             sys.executable,
-            "src/main.py",
-            "calculate",
+            "-m",
+            "toolkit",
+            "calc",
             "2 + 3 * 4",
         ],
         capture_output=True,
@@ -24,10 +25,13 @@ def test_convert_cli() -> None:
     result = subprocess.run(
         [
             sys.executable,
-            "src/main.py",
+            "-m",
+            "toolkit",
             "convert",
             "10",
+            "--from",
             "cm",
+            "--to",
             "m",
         ],
         capture_output=True,
@@ -36,6 +40,7 @@ def test_convert_cli() -> None:
     )
 
     assert result.stdout.strip() == "0.1"
+
 
 def test_calculate_error_returns_code_2() -> None:
     """Проверяет код ошибки калькулятора."""
